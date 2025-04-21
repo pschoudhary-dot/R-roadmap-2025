@@ -1,0 +1,2316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Complete R Programming Learning Guide: From Beginner to Advanced</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .sidebar {
+            height: 100vh;
+            overflow-y: auto;
+            position: fixed;
+            width: 280px;
+            transition: all 0.3s;
+            z-index: 50;
+        }
+        .main-content {
+            margin-left: 280px;
+            transition: all 0.3s;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        .page-section {
+            display: none;
+        }
+        .active-page {
+            display: block;
+        }
+        .sidebar-item {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            transition: all 0.2s;
+        }
+        .sidebar-item:hover {
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+        .sidebar-item.active {
+            background-color: rgba(99, 102, 241, 0.2);
+            font-weight: 600;
+            color: #4f46e5;
+        }
+        .submenu {
+            margin-left: 1rem;
+            display: none;
+        }
+        .submenu.open {
+            display: block;
+        }
+        .has-submenu.open i.fa-chevron-right {
+            transform: rotate(90deg);
+        }
+        .code-block {
+            background: #f8f8f8;
+            border-left: 4px solid #4f46e5;
+            padding: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        table th, table td {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+        }
+        table th {
+            background-color: #f8f8f8;
+            font-weight: 600;
+        }
+        .resource-card {
+            transition: transform 0.2s;
+        }
+        .resource-card:hover {
+            transform: translateY(-5px);
+        }
+        .breadcrumb {
+            display: flex;
+            padding: 0.5rem 0;
+            margin-bottom: 1rem;
+        }
+        .breadcrumb-item {
+            margin-right: 0.5rem;
+        }
+        .breadcrumb-item:not(:last-child)::after {
+            content: "/";
+            margin-left: 0.5rem;
+            color: #9ca3af;
+        }
+        .tab-button {
+            padding: 0.5rem 1rem;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            border-bottom: 2px solid #4f46e5;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+            padding: 1rem 0;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .progress-container {
+            height: 0.5rem;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            margin: 0.5rem 0;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 9999px;
+            background-color: #4f46e5;
+        }
+        .toc {
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+        .toc-item {
+            padding: 0.25rem 0;
+            font-size: 0.875rem;
+        }
+        .toc-item a {
+            display: block;
+            color: #6b7280;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .toc-item a:hover {
+            color: #4f46e5;
+        }
+        .toc-level-2 {
+            margin-left: 0.75rem;
+            font-size: 0.8125rem;
+        }
+        .quote-block {
+            border-left: 4px solid #4f46e5;
+            padding: 1rem;
+            background-color: rgba(99, 102, 241, 0.05);
+            margin: 1rem 0;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Mobile menu toggle -->
+    <div class="fixed top-4 left-4 z-50 md:hidden">
+        <button id="menu-toggle" class="p-2 bg-indigo-600 rounded-md text-white">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar bg-white shadow-lg p-4">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-xl font-bold text-indigo-600">R Learning Guide</h1>
+            <button id="mobile-close" class="md:hidden p-2 text-gray-500">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="mb-4">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Search topics..." class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+            </div>
+        </div>
+        
+        <nav class="space-y-1">
+            <div class="sidebar-item" data-page="home">
+                <i class="fas fa-home mr-2"></i> Home
+            </div>
+            
+            <!-- Beginner Track -->
+            <div class="sidebar-item has-submenu">
+                <div class="flex items-center justify-between">
+                    <div><i class="fas fa-seedling mr-2"></i> Beginner Track</div>
+                    <i class="fas fa-chevron-right text-xs transition-transform duration-200"></i>
+                </div>
+            </div>
+            <div class="submenu">
+                <div class="sidebar-item" data-page="beginner-overview">
+                    <i class="fas fa-circle-info mr-2"></i> Overview
+                </div>
+                <div class="sidebar-item" data-page="r-installation">
+                    <i class="fas fa-download mr-2"></i> Installation & Setup
+                </div>
+                <div class="sidebar-item" data-page="r-basics">
+                    <i class="fas fa-code mr-2"></i> R Basics
+                </div>
+                <div class="sidebar-item" data-page="data-types">
+                    <i class="fas fa-database mr-2"></i> Data Types
+                </div>
+                <div class="sidebar-item" data-page="data-import">
+                    <i class="fas fa-file-import mr-2"></i> Data Import/Export
+                </div>
+                <div class="sidebar-item" data-page="basic-visualization">
+                    <i class="fas fa-chart-bar mr-2"></i> Basic Visualization
+                </div>
+                <div class="sidebar-item" data-page="beginner-exercises">
+                    <i class="fas fa-dumbbell mr-2"></i> Exercises
+                </div>
+            </div>
+            
+            <!-- Intermediate Track -->
+            <div class="sidebar-item has-submenu">
+                <div class="flex items-center justify-between">
+                    <div><i class="fas fa-tree mr-2"></i> Intermediate Track</div>
+                    <i class="fas fa-chevron-right text-xs transition-transform duration-200"></i>
+                </div>
+            </div>
+            <div class="submenu">
+                <div class="sidebar-item" data-page="intermediate-overview">
+                    <i class="fas fa-circle-info mr-2"></i> Overview
+                </div>
+                <div class="sidebar-item" data-page="tidyverse">
+                    <i class="fas fa-broom mr-2"></i> Tidyverse Ecosystem
+                </div>
+                <div class="sidebar-item" data-page="data-manipulation">
+                    <i class="fas fa-wrench mr-2"></i> Data Manipulation
+                </div>
+                <div class="sidebar-item" data-page="advanced-visualization">
+                    <i class="fas fa-chart-line mr-2"></i> Advanced Visualization
+                </div>
+                <div class="sidebar-item" data-page="statistical-analysis">
+                    <i class="fas fa-square-root-alt mr-2"></i> Statistical Analysis
+                </div>
+                <div class="sidebar-item" data-page="rmarkdown">
+                    <i class="fas fa-file-code mr-2"></i> R Markdown
+                </div>
+                <div class="sidebar-item" data-page="intermediate-exercises">
+                    <i class="fas fa-dumbbell mr-2"></i> Exercises
+                </div>
+            </div>
+            
+            <!-- Advanced Track -->
+            <div class="sidebar-item has-submenu">
+                <div class="flex items-center justify-between">
+                    <div><i class="fas fa-mountain mr-2"></i> Advanced Track</div>
+                    <i class="fas fa-chevron-right text-xs transition-transform duration-200"></i>
+                </div>
+            </div>
+            <div class="submenu">
+                <div class="sidebar-item" data-page="advanced-overview">
+                    <i class="fas fa-circle-info mr-2"></i> Overview
+                </div>
+                <div class="sidebar-item" data-page="shiny">
+                    <i class="fas fa-window-restore mr-2"></i> Shiny Applications
+                </div>
+                <div class="sidebar-item" data-page="package-development">
+                    <i class="fas fa-box mr-2"></i> Package Development
+                </div>
+                <div class="sidebar-item" data-page="machine-learning">
+                    <i class="fas fa-robot mr-2"></i> Machine Learning
+                </div>
+                <div class="sidebar-item" data-page="performance">
+                    <i class="fas fa-tachometer-alt mr-2"></i> Performance Optimization
+                </div>
+                <div class="sidebar-item" data-page="advanced-exercises">
+                    <i class="fas fa-dumbbell mr-2"></i> Exercises & Projects
+                </div>
+            </div>
+            
+            <!-- Specialized Applications -->
+            <div class="sidebar-item has-submenu">
+                <div class="flex items-center justify-between">
+                    <div><i class="fas fa-briefcase mr-2"></i> Specialized Applications</div>
+                    <i class="fas fa-chevron-right text-xs transition-transform duration-200"></i>
+                </div>
+            </div>
+            <div class="submenu">
+                <div class="sidebar-item" data-page="data-science">
+                    <i class="fas fa-microscope mr-2"></i> Data Science
+                </div>
+                <div class="sidebar-item" data-page="finance">
+                    <i class="fas fa-chart-pie mr-2"></i> Finance & Economics
+                </div>
+                <div class="sidebar-item" data-page="bioinformatics">
+                    <i class="fas fa-dna mr-2"></i> Bioinformatics
+                </div>
+                <div class="sidebar-item" data-page="social-science">
+                    <i class="fas fa-users mr-2"></i> Social Sciences
+                </div>
+                <div class="sidebar-item" data-page="geospatial">
+                    <i class="fas fa-map-marked-alt mr-2"></i> Geospatial Analysis
+                </div>
+            </div>
+            
+            <!-- Resources -->
+            <div class="sidebar-item has-submenu">
+                <div class="flex items-center justify-between">
+                    <div><i class="fas fa-book mr-2"></i> Resources</div>
+                    <i class="fas fa-chevron-right text-xs transition-transform duration-200"></i>
+                </div>
+            </div>
+            <div class="submenu">
+                <div class="sidebar-item" data-page="documentation">
+                    <i class="fas fa-file-alt mr-2"></i> Documentation
+                </div>
+                <div class="sidebar-item" data-page="video-tutorials">
+                    <i class="fas fa-video mr-2"></i> Video Tutorials
+                </div>
+                <div class="sidebar-item" data-page="cheatsheets">
+                    <i class="fas fa-clipboard-list mr-2"></i> Cheatsheets
+                </div>
+                <div class="sidebar-item" data-page="books">
+                    <i class="fas fa-book-open mr-2"></i> Books
+                </div>
+                <div class="sidebar-item" data-page="datasets">
+                    <i class="fas fa-table mr-2"></i> Datasets
+                </div>
+            </div>
+            
+            <!-- Community -->
+            <div class="sidebar-item" data-page="community">
+                <i class="fas fa-users mr-2"></i> Community & Support
+            </div>
+            
+            <!-- Learning Roadmap -->
+            <div class="sidebar-item" data-page="roadmap">
+                <i class="fas fa-map mr-2"></i> Learning Roadmap
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content p-8 bg-gray-50">
+        <!-- HOME PAGE -->
+        <section id="home" class="page-section active-page fade-in">
+            <header class="mb-8">
+                <h1 class="text-4xl font-bold text-indigo-700 mb-3">The Complete R Programming Learning Guide</h1>
+                <p class="text-xl text-gray-600">From Beginner to Advanced: Everything you need to master R</p>
+            </header>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Welcome to Your R Programming Journey</h2>
+                <p class="mb-4">This comprehensive guide will take you from the very basics of R programming to advanced topics and specialized applications. Whether you're a complete beginner, an intermediate user looking to expand your skills, or an advanced programmer aiming to master R, this resource has something for everyone.</p>
+                
+                <div class="quote-block italic">
+                    <p>"R is more than just a statistical programming language; it's a powerful tool for data science, research, and professional applications across numerous fields."</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                    <div class="bg-indigo-50 rounded-lg p-5 text-center">
+                        <div class="text-5xl text-indigo-500 mb-2">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Beginner Track</h3>
+                        <p class="text-gray-600 mb-4">Start your journey with R basics, installation, data structures, and simple visualizations.</p>
+                        <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition" data-navigate="beginner-overview">Get Started</button>
+                    </div>
+                    
+                    <div class="bg-indigo-50 rounded-lg p-5 text-center">
+                        <div class="text-5xl text-indigo-500 mb-2">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Intermediate Track</h3>
+                        <p class="text-gray-600 mb-4">Level up with the tidyverse, data wrangling, statistical analysis, and R Markdown.</p>
+                        <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition" data-navigate="intermediate-overview">Explore</button>
+                    </div>
+                    
+                    <div class="bg-indigo-50 rounded-lg p-5 text-center">
+                        <div class="text-5xl text-indigo-500 mb-2">
+                            <i class="fas fa-mountain"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Advanced Track</h3>
+                        <p class="text-gray-600 mb-4">Master Shiny apps, package development, machine learning, and performance optimization.</p>
+                        <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition" data-navigate="advanced-overview">Dive Deep</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">What Makes R Special?</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <i class="fas fa-chart-line text-indigo-500 mr-2"></i>
+                            Powerful Data Visualization
+                        </h3>
+                        <p>R offers unmatched capabilities for creating beautiful, publication-quality visualizations with packages like ggplot2, plotly, and many others.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <i class="fas fa-calculator text-indigo-500 mr-2"></i>
+                            Statistical Computing
+                        </h3>
+                        <p>Created by statisticians for statistical analysis, R provides thousands of methods for analyzing data, from basic to cutting-edge techniques.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <i class="fas fa-box-open text-indigo-500 mr-2"></i>
+                            Extensive Package Ecosystem
+                        </h3>
+                        <p>With over 18,000 packages on CRAN and more on Bioconductor and GitHub, R has specialized tools for virtually any analytical task.</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <i class="fas fa-users text-indigo-500 mr-2"></i>
+                            Supportive Community
+                        </h3>
+                        <p>R has a vibrant, inclusive community that values collaboration, sharing code, and supporting learners at all levels.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Specialized Applications</h2>
+                <p class="mb-4">R is used across numerous domains and industries. Explore how R is applied in:</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="resource-card bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md">
+                        <div class="text-3xl text-indigo-500 mb-2">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <h3 class="font-semibold">Data Science</h3>
+                        <p class="text-sm text-gray-600">Machine learning, predictive modeling, and data mining with R.</p>
+                        <button class="mt-3 text-indigo-600 hover:text-indigo-800" data-navigate="data-science">Learn more →</button>
+                    </div>
+                    
+                    <div class="resource-card bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md">
+                        <div class="text-3xl text-indigo-500 mb-2">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h3 class="font-semibold">Finance & Economics</h3>
+                        <p class="text-sm text-gray-600">Financial modeling, time series analysis, and economic research.</p>
+                        <button class="mt-3 text-indigo-600 hover:text-indigo-800" data-navigate="finance">Learn more →</button>
+                    </div>
+                    
+                    <div class="resource-card bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md">
+                        <div class="text-3xl text-indigo-500 mb-2">
+                            <i class="fas fa-dna"></i>
+                        </div>
+                        <h3 class="font-semibold">Bioinformatics</h3>
+                        <p class="text-sm text-gray-600">Genomic data analysis, sequence processing, and visualization.</p>
+                        <button class="mt-3 text-indigo-600 hover:text-indigo-800" data-navigate="bioinformatics">Learn more →</button>
+                    </div>
+                    
+                    <div class="resource-card bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md">
+                        <div class="text-3xl text-indigo-500 mb-2">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="font-semibold">Social Sciences</h3>
+                        <p class="text-sm text-gray-600">Survey analysis, experimental design, and social network analysis.</p>
+                        <button class="mt-3 text-indigo-600 hover:text-indigo-800" data-navigate="social-science">Learn more →</button>
+                    </div>
+                    
+                    <div class="resource-card bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md">
+                        <div class="text-3xl text-indigo-500 mb-2">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <h3 class="font-semibold">Geospatial Analysis</h3>
+                        <p class="text-sm text-gray-600">Mapping, spatial statistics, and geographic data processing.</p>
+                        <button class="mt-3 text-indigo-600 hover:text-indigo-800" data-navigate="geospatial">Learn more →</button>
+                    </div>
+                    
+                    <div class="resource-card bg-gray-50 rounded-lg p-4 border border-gray-200 hover:shadow-md">
+                        <div class="text-3xl text-indigo-500 mb-2">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <h3 class="font-semibold">And Many More...</h3>
+                        <p class="text-sm text-gray-600">Explore various specialized applications and domains where R excels.</p>
+                        <button class="mt-3 text-indigo-600 hover:text-indigo-800" data-navigate="roadmap">View Roadmap →</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-indigo-600 text-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-3/4">
+                        <h2 class="text-2xl font-semibold mb-2">Ready to Begin Your R Journey?</h2>
+                        <p class="mb-4">Start with the beginner's track or jump directly to topics that interest you most. This guide is designed to be flexible to your learning needs.</p>
+                    </div>
+                    <div class="md:w-1/4 text-center mt-4 md:mt-0">
+                        <button class="px-6 py-3 bg-white text-indigo-600 rounded-md font-semibold hover:bg-gray-100 transition" data-navigate="beginner-overview">Start Learning</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEGINNER TRACK: OVERVIEW -->
+        <section id="beginner-overview" class="page-section fade-in">
+            <div class="breadcrumb text-sm text-gray-500 mb-4">
+                <div class="breadcrumb-item"><a href="#" data-navigate="home">Home</a></div>
+                <div class="breadcrumb-item">Beginner Track</div>
+                <div class="breadcrumb-item">Overview</div>
+            </div>
+            
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-indigo-700 mb-3">Beginner Track: Getting Started with R</h1>
+                <p class="text-gray-600">Everything you need to begin your R programming journey</p>
+            </header>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">What You'll Learn</h2>
+                <p class="mb-4">The beginner track is designed to introduce you to R programming from scratch. By the end of this track, you'll have a solid foundation in R, including:</p>
+                
+                <ul class="list-disc pl-6 mb-6 space-y-2">
+                    <li>Setting up your R environment with RStudio</li>
+                    <li>Understanding R's syntax and basic operations</li>
+                    <li>Working with different data types and structures</li>
+                    <li>Importing and exporting data</li>
+                    <li>Creating basic visualizations</li>
+                    <li>Writing simple functions</li>
+                    <li>Understanding control structures (loops and conditionals)</li>
+                </ul>
+                
+                <div class="quote-block">
+                    <p>"The best way to learn R is by doing. Each section includes practical examples and exercises to help reinforce your learning."</p>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Learning Path</h2>
+                
+                <div class="space-y-4">
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">1</span>
+                            Installation & Setup
+                        </h3>
+                        <p class="text-gray-600 ml-11">Install R and RStudio, learn the RStudio interface, and set up your working environment.</p>
+                        <div class="ml-11 mt-3">
+                            <button class="text-indigo-600 hover:text-indigo-800" data-navigate="r-installation">Go to section →</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">2</span>
+                            R Basics
+                        </h3>
+                        <p class="text-gray-600 ml-11">Learn R syntax, arithmetic operations, variables, and basic functions.</p>
+                        <div class="ml-11 mt-3">
+                            <button class="text-indigo-600 hover:text-indigo-800" data-navigate="r-basics">Go to section →</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">3</span>
+                            Data Types
+                        </h3>
+                        <p class="text-gray-600 ml-11">Explore R's data types, including vectors, matrices, lists, data frames, and factors.</p>
+                        <div class="ml-11 mt-3">
+                            <button class="text-indigo-600 hover:text-indigo-800" data-navigate="data-types">Go to section →</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">4</span>
+                            Data Import/Export
+                        </h3>
+                        <p class="text-gray-600 ml-11">Learn to read and write data in various formats (CSV, Excel, R data files).</p>
+                        <div class="ml-11 mt-3">
+                            <button class="text-indigo-600 hover:text-indigo-800" data-navigate="data-import">Go to section →</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">5</span>
+                            Basic Visualization
+                        </h3>
+                        <p class="text-gray-600 ml-11">Create simple plots and graphics using R's built-in plotting functions.</p>
+                        <div class="ml-11 mt-3">
+                            <button class="text-indigo-600 hover:text-indigo-800" data-navigate="basic-visualization">Go to section →</button>
+                        </div>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-2 flex items-center">
+                            <span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3">6</span>
+                            Practice Exercises
+                        </h3>
+                        <p class="text-gray-600 ml-11">Reinforce your learning with hands-on exercises and small projects.</p>
+                        <div class="ml-11 mt-3">
+                            <button class="text-indigo-600 hover:text-indigo-800" data-navigate="beginner-exercises">Go to section →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Recommended Resources</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <h3 class="font-semibold mb-2">R for Data Science</h3>
+                        <p class="text-sm text-gray-600">By Hadley Wickham & Garrett Grolemund - Excellent introduction to R with a focus on data science workflows.</p>
+                        <a href="https://r4ds.had.co.nz/" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm inline-block mt-2">View Resource →</a>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <h3 class="font-semibold mb-2">swirl: Learn R, in R</h3>
+                        <p class="text-sm text-gray-600">Interactive R package that teaches you R programming right in the console.</p>
+                        <a href="https://swirlstats.com/" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm inline-block mt-2">View Resource →</a>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <h3 class="font-semibold mb-2">R Programming Tutorial</h3>
+                        <p class="text-sm text-gray-600">Comprehensive video tutorial covering the basics of statistical computing.</p>
+                        <a href="https://www.youtube.com/watch?v=_V8eKsto3Ug" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm inline-block mt-2">View Resource →</a>
+                    </div>
+                    
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <h3 class="font-semibold mb-2">W3Schools R Tutorial</h3>
+                        <p class="text-sm text-gray-600">Well-organized, beginner-friendly tutorial with examples and exercises.</p>
+                        <a href="https://www.w3schools.com/r/" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm inline-block mt-2">View Resource →</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-indigo-600 text-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="md:w-3/4">
+                        <h2 class="text-2xl font-semibold mb-2">Ready to Start Learning?</h2>
+                        <p>Begin with installing R and RStudio, and take your first steps in R programming.</p>
+                    </div>
+                    <div class="md:w-1/4 text-center mt-4 md:mt-0">
+                        <button class="px-6 py-3 bg-white text-indigo-600 rounded-md font-semibold hover:bg-gray-100 transition" data-navigate="r-installation">Start with Installation</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEGINNER TRACK: R INSTALLATION -->
+        <section id="r-installation" class="page-section fade-in">
+            <div class="breadcrumb text-sm text-gray-500 mb-4">
+                <div class="breadcrumb-item"><a href="#" data-navigate="home">Home</a></div>
+                <div class="breadcrumb-item"><a href="#" data-navigate="beginner-overview">Beginner Track</a></div>
+                <div class="breadcrumb-item">Installation & Setup</div>
+            </div>
+            
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-indigo-700 mb-3">Installing R and RStudio</h1>
+                <p class="text-gray-600">Setting up your environment for R programming</p>
+            </header>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Step 1: Install R</h2>
+                        <p class="mb-4">R is the core programming language we'll be using. Here's how to install it:</p>
+                        
+                        <div class="flex mb-4">
+                            <div class="tab-button active" data-tab="windows-r">Windows</div>
+                            <div class="tab-button" data-tab="mac-r">macOS</div>
+                            <div class="tab-button" data-tab="linux-r">Linux</div>
+                        </div>
+                        
+                        <div class="tab-content active" id="windows-r">
+                            <ol class="list-decimal pl-6 space-y-3">
+                                <li>Visit the <a href="https://cran.r-project.org/bin/windows/base/" target="_blank" class="text-indigo-600 hover:underline">CRAN website for Windows</a></li>
+                                <li>Click on "Download R x.x.x for Windows" (where x.x.x is the latest version number)</li>
+                                <li>Run the downloaded installer (.exe file)</li>
+                                <li>Follow the installation wizard with default settings</li>
+                                <li>Once installation is complete, you'll have R on your system</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="tab-content" id="mac-r">
+                            <ol class="list-decimal pl-6 space-y-3">
+                                <li>Visit the <a href="https://cran.r-project.org/bin/macosx/" target="_blank" class="text-indigo-600 hover:underline">CRAN website for macOS</a></li>
+                                <li>Download the latest R package (.pkg file) appropriate for your macOS version</li>
+                                <li>Open the downloaded file and follow the installation instructions</li>
+                                <li>For newer Macs with Apple Silicon (M1/M2 chips), make sure to download the appropriate version</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="tab-content" id="linux-r">
+                            <p class="mb-3">For Debian/Ubuntu distributions:</p>
+                            <div class="code-block mb-4">
+sudo apt update
+sudo apt install r-base r-base-dev</div>
+                            
+                            <p class="mb-3">For Fedora/RHEL/CentOS:</p>
+                            <div class="code-block mb-4">
+sudo dnf install R</div>
+                            
+                            <p>For other distributions, check the <a href="https://cran.r-project.org/bin/linux/" target="_blank" class="text-indigo-600 hover:underline">CRAN Linux page</a> for specific instructions.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Step 2: Install RStudio</h2>
+                        <p class="mb-4">RStudio is an Integrated Development Environment (IDE) that makes working with R much easier and more productive.</p>
+                        
+                        <div class="flex mb-4">
+                            <div class="tab-button active" data-tab="windows-rstudio">Windows</div>
+                            <div class="tab-button" data-tab="mac-rstudio">macOS</div>
+                            <div class="tab-button" data-tab="linux-rstudio">Linux</div>
+                        </div>
+                        
+                        <div class="tab-content active" id="windows-rstudio">
+                            <ol class="list-decimal pl-6 space-y-3">
+                                <li>Visit the <a href="https://posit.co/download/rstudio-desktop/" target="_blank" class="text-indigo-600 hover:underline">RStudio Download page</a></li>
+                                <li>Scroll down and find the Windows installer under "All Installers"</li>
+                                <li>Download the .exe file</li>
+                                <li>Run the installer and follow the instructions</li>
+                                <li>After installation, you can launch RStudio from your Start menu</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="tab-content" id="mac-rstudio">
+                            <ol class="list-decimal pl-6 space-y-3">
+                                <li>Visit the <a href="https://posit.co/download/rstudio-desktop/" target="_blank" class="text-indigo-600 hover:underline">RStudio Download page</a></li>
+                                <li>Scroll down and find the macOS installer (.dmg) under "All Installers"</li>
+                                <li>Download the .dmg file</li>
+                                <li>Open the file and drag RStudio to your Applications folder</li>
+                                <li>Open RStudio from your Applications folder or Launchpad</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="tab-content" id="linux-rstudio">
+                            <ol class="list-decimal pl-6 space-y-3">
+                                <li>Visit the <a href="https://posit.co/download/rstudio-desktop/" target="_blank" class="text-indigo-600 hover:underline">RStudio Download page</a></li>
+                                <li>Scroll down and find the appropriate Linux installer for your distribution (DEB for Ubuntu/Debian, RPM for Fedora/RHEL)</li>
+                                <li>Download the installer</li>
+                                <li>For Ubuntu/Debian:
+                                    <div class="code-block mt-2">
+sudo dpkg -i rstudio-x.y.z-amd64.deb
+# If there are dependency issues:
+sudo apt-get install -f</div>
+                                </li>
+                                <li>For Fedora/RHEL/CentOS:
+                                    <div class="code-block mt-2">
+sudo rpm -i rstudio-x.y.z-x86_64.rpm</div>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Step 3: Understanding the RStudio Interface</h2>
+                        
+                        <p class="mb-4">When you open RStudio, you'll see four main panels (though some may be minimized at first):</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold text-indigo-600 mb-2">Source Editor (Top Left)</h3>
+                                <p class="text-gray-600 text-sm">This is where you'll write and edit your R scripts. You can have multiple script files open in tabs.</p>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold text-indigo-600 mb-2">Console (Bottom Left)</h3>
+                                <p class="text-gray-600 text-sm">This is where you can type R commands and see the results immediately. It's also where output from your scripts appears.</p>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold text-indigo-600 mb-2">Environment/History (Top Right)</h3>
+                                <p class="text-gray-600 text-sm">Shows the objects (variables, functions) in your current R session and your command history.</p>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold text-indigo-600 mb-2">Files/Plots/Packages/Help (Bottom Right)</h3>
+                                <p class="text-gray-600 text-sm">Provides access to your files, any plots you create, installed packages, and help documentation.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="quote-block mb-6">
+                            <p>Investing time to learn the RStudio interface now will make your R programming journey much smoother. Explore the menus and options to become familiar with the environment.</p>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold text-indigo-600 mb-3">Important RStudio Features to Explore</h3>
+                        
+                        <ul class="list-disc pl-6 space-y-2 mb-6">
+                            <li>Projects: Keep your work organized (File → New Project)</li>
+                            <li>Code completion: Press Tab while typing to see suggestions</li>
+                            <li>Keyboard shortcuts: View Help → Keyboard Shortcuts Help</li>
+                            <li>R Markdown: For creating reproducible documents</li>
+                            <li>Package installation via the Packages tab</li>
+                            <li>Customizing your environment in Tools → Global Options</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Step 4: Installing Essential Packages</h2>
+                        
+                        <p class="mb-4">Packages extend R's functionality. Here are some essential packages to install:</p>
+                        
+                        <div class="code-block mb-6">
+# Install the tidyverse collection (includes ggplot2, dplyr, tidyr, etc.)
+install.packages("tidyverse")
+
+# Install other useful packages
+install.packages(c("rmarkdown", "knitr", "janitor", "skimr", "readxl"))</div>
+                        
+                        <p class="mb-4">Once packages are installed, you can load them in your R session using the <code>library()</code> function:</p>
+                        
+                        <div class="code-block mb-6">
+# Load the tidyverse
+library(tidyverse)
+
+# Load a specific package
+library(readxl)</div>
+                        
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-yellow-800">Note</h3>
+                                    <div class="text-sm text-yellow-700">
+                                        <p>You only need to install packages once (unless updating), but you need to load them with <code>library()</code> in each new R session where you want to use them.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Step 5: Create Your First R Script</h2>
+                        
+                        <p class="mb-4">Let's create a simple R script to test that everything is working:</p>
+                        
+                        <ol class="list-decimal pl-6 space-y-3 mb-6">
+                            <li>In RStudio, click File → New File → R Script</li>
+                            <li>A new empty script will open in the Source Editor</li>
+                            <li>Type or paste the following code:</li>
+                        </ol>
+                        
+                        <div class="code-block mb-6">
+# My first R script
+print("Hello, world!")
+
+# Create some data
+x <- c(1, 2, 3, 4, 5)
+y <- c(2, 4, 6, 8, 10)
+
+# Print summary statistics
+summary(x)
+
+# Create a simple plot
+plot(x, y, main="My First Plot", 
+     xlab="X axis", ylab="Y axis", 
+     col="blue", pch=19)</div>
+                        
+                        <ol class="list-decimal pl-6 space-y-3 mb-6" start="4">
+                            <li>Save the script (File → Save or Ctrl+S / Cmd+S)</li>
+                            <li>Run the script (click "Run" or press Ctrl+Enter / Cmd+Enter to run line by line)</li>
+                        </ol>
+                        
+                        <p>You should see the text output in the console and a simple scatter plot in the Plots panel.</p>
+                    </div>
+                    
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-6 mb-8">
+                        <h2 class="text-xl font-semibold text-indigo-600 mb-4">Troubleshooting Common Installation Issues</h2>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-semibold mb-1">R and RStudio versions don't match</h3>
+                                <p class="text-sm text-gray-600">If you see warnings about R version compatibility, ensure you're using the latest versions of both R and RStudio.</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-semibold mb-1">Package installation errors</h3>
+                                <p class="text-sm text-gray-600">If packages fail to install, check your internet connection, and ensure you have the necessary system dependencies (especially on Linux).</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-semibold mb-1">Permission issues</h3>
+                                <p class="text-sm text-gray-600">On Windows, try running RStudio as Administrator. On macOS/Linux, you might need to adjust file permissions.</p>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-semibold mb-1">RStudio doesn't recognize R</h3>
+                                <p class="text-sm text-gray-600">Make sure you installed R before RStudio. In RStudio, check Tools → Global Options → General → R version.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8 sticky top-4">
+                        <h3 class="text-lg font-semibold text-indigo-600 mb-4">In This Section</h3>
+                        <nav class="toc">
+                            <div class="toc-item"><a href="#r-installation">Installing R and RStudio</a></div>
+                            <div class="toc-item toc-level-2"><a href="#step-1-install-r">Step 1: Install R</a></div>
+                            <div class="toc-item toc-level-2"><a href="#step-2-install-rstudio">Step 2: Install RStudio</a></div>
+                            <div class="toc-item toc-level-2"><a href="#step-3-understanding-the-rstudio-interface">Step 3: Understanding the RStudio Interface</a></div>
+                            <div class="toc-item toc-level-2"><a href="#step-4-installing-essential-packages">Step 4: Installing Essential Packages</a></div>
+                            <div class="toc-item toc-level-2"><a href="#step-5-create-your-first-r-script">Step 5: Create Your First R Script</a></div>
+                            <div class="toc-item toc-level-2"><a href="#troubleshooting-common-installation-issues">Troubleshooting</a></div>
+                        </nav>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h3 class="text-lg font-semibold text-indigo-600 mb-4">Learning Progress</h3>
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>Installation & Setup</span>
+                                    <span>1/6</span>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 16.67%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col space-y-2">
+                                <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition w-full" data-navigate="r-basics">Next: R Basics</button>
+                                <button class="px-4 py-2 bg-white border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition w-full" data-navigate="beginner-overview">Back to Overview</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h3 class="text-lg font-semibold text-indigo-600 mb-4">Additional Resources</h3>
+                            <ul class="space-y-2">
+                                <li>
+                                    <a href="https://education.rstudio.com/learn/beginner/" target="_blank" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                                        <i class="fas fa-external-link-alt mr-2 text-xs"></i>
+                                        RStudio Education: Beginner Resources
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/watch?v=FIrsOBy5k58" target="_blank" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                                        <i class="fas fa-video mr-2 text-xs"></i>
+                                        RStudio Interface Tutorial
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://posit.co/resources/cheatsheets/" target="_blank" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                                        <i class="fas fa-file-alt mr-2 text-xs"></i>
+                                        RStudio Cheatsheets
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BEGINNER TRACK: R BASICS -->
+        <section id="r-basics" class="page-section fade-in">
+            <div class="breadcrumb text-sm text-gray-500 mb-4">
+                <div class="breadcrumb-item"><a href="#" data-navigate="home">Home</a></div>
+                <div class="breadcrumb-item"><a href="#" data-navigate="beginner-overview">Beginner Track</a></div>
+                <div class="breadcrumb-item">R Basics</div>
+            </div>
+            
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-indigo-700 mb-3">R Basics: Fundamentals of R Programming</h1>
+                <p class="text-gray-600">Learn the core concepts and syntax of the R language</p>
+            </header>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">The R Console and Basic Operations</h2>
+                        
+                        <p class="mb-4">R can be used as a powerful calculator. You can perform arithmetic operations directly in the console:</p>
+                        
+                        <div class="code-block mb-6">
+# Addition
+5 + 3
+# [1] 8
+
+# Subtraction
+10 - 4
+# [1] 6
+
+# Multiplication
+6 * 7
+# [1] 42
+
+# Division
+20 / 5
+# [1] 4
+
+# Exponentiation
+2 ^ 3
+# [1] 8
+
+# Modulo (remainder)
+17 %% 5
+# [1] 2
+
+# Integer division
+17 %/% 5
+# [1] 3</div>
+                        
+                        <p class="mb-4">R follows the standard order of operations (PEMDAS):</p>
+                        
+                        <div class="code-block mb-6">
+# Parentheses, Exponents, Multiplication/Division, Addition/Subtraction
+(3 + 4) * 2
+# [1] 14
+
+3 + 4 * 2
+# [1] 11</div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Variables and Assignments</h2>
+                        
+                        <p class="mb-4">In R, you can store values in variables using the assignment operator <code>&lt;-</code> (or <code>=</code>, though <code>&lt;-</code> is more conventional):</p>
+                        
+                        <div class="code-block mb-6">
+# Assign a value to a variable
+x <- 10
+y <- 20
+
+# Display the variable
+x
+# [1] 10
+
+# Use variables in calculations
+z <- x + y
+z
+# [1] 30</div>
+                        
+                        <p class="mb-4">Variable naming rules in R:</p>
+                        <ul class="list-disc pl-6 mb-6 space-y-1">
+                            <li>Names can contain letters, numbers, underscores (_) and periods (.)</li>
+                            <li>Names must start with a letter or a period (if starts with period, it cannot be followed by a number)</li>
+                            <li>Names are case-sensitive (<code>Value</code> and <code>value</code> are different variables)</li>
+                            <li>Avoid using reserved words (like <code>if</code>, <code>for</code>, <code>function</code>, etc.)</li>
+                        </ul>
+                        
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-yellow-800">Best Practice</h3>
+                                    <div class="text-sm text-yellow-700">
+                                        <p>Use descriptive variable names that indicate what the variable represents. This makes your code more readable and easier to maintain.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="mb-4">Examples of good variable names:</p>
+                        
+                        <div class="code-block mb-6">
+# Good variable names
+age <- 25
+first_name <- "John"
+annual_income <- 50000
+average_score <- sum(scores) / length(scores)</div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Basic Data Types</h2>
+                        
+                        <p class="mb-4">R has several basic data types:</p>
+                        
+                        <div class="overflow-x-auto mb-6">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Data Type</th>
+                                        <th>Description</th>
+                                        <th>Example</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Numeric</td>
+                                        <td>Decimal numbers</td>
+                                        <td><code>42.5, 17, -3.14</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Integer</td>
+                                        <td>Whole numbers (with L suffix)</td>
+                                        <td><code>42L, 2L, -5L</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Character</td>
+                                        <td>Text or string values</td>
+                                        <td><code>"hello", 'world'</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Logical</td>
+                                        <td>Boolean values (TRUE/FALSE)</td>
+                                        <td><code>TRUE, FALSE, T, F</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Complex</td>
+                                        <td>Complex numbers</td>
+                                        <td><code>3+2i</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <p class="mb-4">You can check the data type of a variable using the <code>class()</code> function:</p>
+                        
+                        <div class="code-block mb-6">
+# Examples of different data types
+num_value <- 42.5
+int_value <- 42L
+text_value <- "Hello, R!"
+logical_value <- TRUE
+
+# Check data types
+class(num_value)    # "numeric"
+class(int_value)    # "integer"
+class(text_value)   # "character"
+class(logical_value)  # "logical"</div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Vectors: R's Basic Data Structure</h2>
+                        
+                        <p class="mb-4">Vectors are the most basic data structure in R. They are collections of elements of the same type.</p>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Creating Vectors</h3>
+                        
+                        <p class="mb-4">You can create vectors using the <code>c()</code> function (c stands for "combine"):</p>
+                        
+                        <div class="code-block mb-6">
+# Numeric vector
+numbers <- c(10, 20, 30, 40, 50)
+numbers
+# [1] 10 20 30 40 50
+
+# Character vector
+fruits <- c("apple", "banana", "orange", "grape")
+fruits
+# [1] "apple"  "banana" "orange" "grape"
+
+# Logical vector
+flags <- c(TRUE, FALSE, TRUE, TRUE)
+flags
+# [1]  TRUE FALSE  TRUE  TRUE</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Vector Operations</h3>
+                        
+                        <p class="mb-4">R is designed for vector operations, which means many operations work on all elements of a vector:</p>
+                        
+                        <div class="code-block mb-6">
+# Vector arithmetic
+x <- c(1, 2, 3, 4, 5)
+y <- c(10, 20, 30, 40, 50)
+
+# Addition (element-wise)
+x + y
+# [1] 11 22 33 44 55
+
+# Multiplication (element-wise)
+x * 2
+# [1]  2  4  6  8 10
+
+# Vector functions
+sum(x)      # Sum of all elements: 15
+mean(x)     # Mean (average): 3
+length(x)   # Number of elements: 5
+max(x)      # Maximum value: 5
+min(x)      # Minimum value: 1</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Vector Indexing</h3>
+                        
+                        <p class="mb-4">You can access elements of a vector using square brackets and an index:</p>
+                        
+                        <div class="code-block mb-6">
+# Create a vector
+letters_vec <- c("a", "b", "c", "d", "e")
+
+# Access the first element
+letters_vec[1]  # "a" (R indexing starts at 1, not 0)
+
+# Access multiple elements
+letters_vec[c(1, 3, 5)]  # "a" "c" "e"
+
+# Access a range of elements
+letters_vec[2:4]  # "b" "c" "d"
+
+# Negative indices exclude elements
+letters_vec[-1]  # "b" "c" "d" "e" (all except the first)
+
+# Logical indexing
+letters_vec[c(TRUE, FALSE, TRUE, FALSE, TRUE)]  # "a" "c" "e"</div>
+                        
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800">Important Note</h3>
+                                    <div class="text-sm text-blue-700">
+                                        <p>Unlike many other programming languages that start counting at 0, R's indexing starts at 1. This is a common source of confusion for people coming from languages like Python, JavaScript, or C.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Built-in Functions</h2>
+                        
+                        <p class="mb-4">R has many built-in functions that you'll use frequently:</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Mathematical Functions</h3>
+                                <ul class="list-disc pl-4 text-sm space-y-1">
+                                    <li><code>sum()</code> - Sum of elements</li>
+                                    <li><code>mean()</code> - Average of elements</li>
+                                    <li><code>median()</code> - Median value</li>
+                                    <li><code>min()</code>, <code>max()</code> - Minimum and maximum</li>
+                                    <li><code>range()</code> - Range of values</li>
+                                    <li><code>round()</code>, <code>floor()</code>, <code>ceiling()</code> - Rounding</li>
+                                    <li><code>abs()</code> - Absolute value</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Character/String Functions</h3>
+                                <ul class="list-disc pl-4 text-sm space-y-1">
+                                    <li><code>paste()</code> - Concatenate strings</li>
+                                    <li><code>substr()</code> - Extract substring</li>
+                                    <li><code>nchar()</code> - Count characters</li>
+                                    <li><code>toupper()</code>, <code>tolower()</code> - Change case</li>
+                                    <li><code>strsplit()</code> - Split strings</li>
+                                    <li><code>grep()</code> - Pattern matching</li>
+                                    <li><code>gsub()</code> - String replacement</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Utility Functions</h3>
+                                <ul class="list-disc pl-4 text-sm space-y-1">
+                                    <li><code>length()</code> - Number of elements</li>
+                                    <li><code>seq()</code> - Generate sequences</li>
+                                    <li><code>rep()</code> - Repeat elements</li>
+                                    <li><code>sample()</code> - Random sampling</li>
+                                    <li><code>sort()</code> - Sort elements</li>
+                                    <li><code>rev()</code> - Reverse elements</li>
+                                    <li><code>unique()</code> - Find unique elements</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Statistical Functions</h3>
+                                <ul class="list-disc pl-4 text-sm space-y-1">
+                                    <li><code>sd()</code> - Standard deviation</li>
+                                    <li><code>var()</code> - Variance</li>
+                                    <li><code>cor()</code> - Correlation</li>
+                                    <li><code>quantile()</code> - Quantiles</li>
+                                    <li><code>summary()</code> - Summary statistics</li>
+                                    <li><code>table()</code> - Frequency table</li>
+                                    <li><code>prop.table()</code> - Proportion table</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <p class="mb-4">Examples of using built-in functions:</p>
+                        
+                        <div class="code-block mb-6">
+# Create a vector of data
+data <- c(15, 23, 36, 42, 57, 63, 28, 39)
+
+# Basic statistics
+mean(data)        # 37.875
+median(data)      # 37.5
+sd(data)          # 15.23321
+range(data)       # 15 63
+summary(data)     # Min, 1st Qu, Median, Mean, 3rd Qu, Max
+
+# String functions
+names <- c("John Smith", "Mary Johnson", "David Lee")
+toupper(names)    # "JOHN SMITH" "MARY JOHNSON" "DAVID LEE"
+nchar(names)      # 10 12 9
+substr(names, 1, 5)  # "John " "Mary " "David"
+
+# Utility functions
+sequence <- seq(from = 0, to = 1, by = 0.2)  # 0.0 0.2 0.4 0.6 0.8 1.0
+repeated <- rep(1:3, times = 2)              # 1 2 3 1 2 3
+random_sample <- sample(1:100, 5)            # 5 random numbers between 1 and 100</div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Getting Help in R</h2>
+                        
+                        <p class="mb-4">R has an extensive built-in help system. You can access documentation for any function using <code>?</code> or <code>help()</code>:</p>
+                        
+                        <div class="code-block mb-6">
+# Get help on the mean function
+?mean
+# or
+help(mean)
+
+# Search for help on a topic
+??regression
+# or
+help.search("regression")</div>
+                        
+                        <p class="mb-4">The help page typically includes:</p>
+                        <ul class="list-disc pl-6 mb-6 space-y-1">
+                            <li>Description of what the function does</li>
+                            <li>Usage syntax</li>
+                            <li>Arguments (parameters) with explanations</li>
+                            <li>Details about how the function works</li>
+                            <li>Return value information</li>
+                            <li>Examples of usage</li>
+                        </ul>
+                        
+                        <div class="quote-block">
+                            <p>Reading function documentation is a crucial skill for R programmers. The examples section is particularly helpful for seeing how to use functions in context.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Basic Programming Concepts</h2>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Conditional Statements (if-else)</h3>
+                        
+                        <p class="mb-4">Conditional statements allow you to execute code based on certain conditions:</p>
+                        
+                        <div class="code-block mb-6">
+# Basic if statement
+x <- 10
+if (x > 5) {
+  print("x is greater than 5")
+}
+
+# if-else statement
+y <- 3
+if (y > 5) {
+  print("y is greater than 5")
+} else {
+  print("y is 5 or less")
+}
+
+# if-else if-else chain
+z <- 0
+if (z > 0) {
+  print("z is positive")
+} else if (z < 0) {
+  print("z is negative")
+} else {
+  print("z is zero")
+}</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Loops</h3>
+                        
+                        <p class="mb-4">Loops allow you to repeat code multiple times:</p>
+                        
+                        <div class="code-block mb-6">
+# for loop
+for (i in 1:5) {
+  print(paste("Iteration:", i))
+}
+
+# while loop
+count <- 1
+while (count <= 5) {
+  print(paste("Count is:", count))
+  count <- count + 1
+}</div>
+                        
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-yellow-800">Important Note</h3>
+                                    <div class="text-sm text-yellow-700">
+                                        <p>While loops are common in many programming languages, R is designed for vectorized operations. When possible, try to use vector operations instead of loops for better performance and cleaner code.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Functions</h3>
+                        
+                        <p class="mb-4">You can define your own functions to reuse code:</p>
+                        
+                        <div class="code-block mb-6">
+# Define a simple function
+say_hello <- function(name) {
+  result <- paste("Hello,", name, "!")
+  return(result)
+}
+
+# Call the function
+say_hello("Alice")  # "Hello, Alice !"
+
+# Function with multiple parameters and default values
+calculate_rectangle_area <- function(length, width = 1) {
+  area <- length * width
+  return(area)
+}
+
+# Call with both parameters
+calculate_rectangle_area(5, 3)  # 15
+
+# Call with default width
+calculate_rectangle_area(5)  # 5</div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Practice Exercises</h2>
+                        
+                        <p class="mb-4">Try these exercises to reinforce what you've learned:</p>
+                        
+                        <div class="space-y-6">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Exercise 1: Basic Operations</h3>
+                                <p class="text-gray-600 mb-3">Create variables for your age, name, and whether you're a student (TRUE/FALSE). Print each variable and its data type.</p>
+                                <button class="text-sm text-indigo-600 hover:text-indigo-800" onclick="toggleSolution('solution1')">Show/Hide Solution</button>
+                                <div id="solution1" class="mt-3 hidden">
+                                    <div class="code-block">
+# Create variables
+my_age <- 25
+my_name <- "John Doe"
+is_student <- TRUE
+
+# Print variables and their types
+print(my_age)
+print(class(my_age))
+
+print(my_name)
+print(class(my_name))
+
+print(is_student)
+print(class(is_student))</div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Exercise 2: Vector Operations</h3>
+                                <p class="text-gray-600 mb-3">Create a vector of 5 random numbers between 1 and 100. Calculate the mean, median, and standard deviation of this vector.</p>
+                                <button class="text-sm text-indigo-600 hover:text-indigo-800" onclick="toggleSolution('solution2')">Show/Hide Solution</button>
+                                <div id="solution2" class="mt-3 hidden">
+                                    <div class="code-block">
+# Create a vector of 5 random numbers
+random_numbers <- sample(1:100, 5)
+print(random_numbers)
+
+# Calculate statistics
+mean_value <- mean(random_numbers)
+median_value <- median(random_numbers)
+sd_value <- sd(random_numbers)
+
+print(paste("Mean:", mean_value))
+print(paste("Median:", median_value))
+print(paste("Standard Deviation:", sd_value))</div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Exercise 3: Conditional Logic</h3>
+                                <p class="text-gray-600 mb-3">Write a function called <code>grade_score</code> that takes a numerical score (0-100) and returns a letter grade: A (90-100), B (80-89), C (70-79), D (60-69), F (below 60).</p>
+                                <button class="text-sm text-indigo-600 hover:text-indigo-800" onclick="toggleSolution('solution3')">Show/Hide Solution</button>
+                                <div id="solution3" class="mt-3 hidden">
+                                    <div class="code-block">
+# Function to convert numerical score to letter grade
+grade_score <- function(score) {
+  if (score >= 90 && score <= 100) {
+    return("A")
+  } else if (score >= 80 && score < 90) {
+    return("B")
+  } else if (score >= 70 && score < 80) {
+    return("C")
+  } else if (score >= 60 && score < 70) {
+    return("D")
+  } else if (score >= 0 && score < 60) {
+    return("F")
+  } else {
+    return("Invalid score")
+  }
+}
+
+# Test the function
+test_scores <- c(95, 82, 73, 65, 55, 101, -5)
+for (score in test_scores) {
+  print(paste("Score:", score, "Grade:", grade_score(score)))
+}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8 sticky top-4">
+                        <h3 class="text-lg font-semibold text-indigo-600 mb-4">In This Section</h3>
+                        <nav class="toc">
+                            <div class="toc-item"><a href="#r-basics">R Basics</a></div>
+                            <div class="toc-item toc-level-2"><a href="#the-r-console-and-basic-operations">The R Console and Basic Operations</a></div>
+                            <div class="toc-item toc-level-2"><a href="#variables-and-assignments">Variables and Assignments</a></div>
+                            <div class="toc-item toc-level-2"><a href="#basic-data-types">Basic Data Types</a></div>
+                            <div class="toc-item toc-level-2"><a href="#vectors-rs-basic-data-structure">Vectors: R's Basic Data Structure</a></div>
+                            <div class="toc-item toc-level-2"><a href="#built-in-functions">Built-in Functions</a></div>
+                            <div class="toc-item toc-level-2"><a href="#getting-help-in-r">Getting Help in R</a></div>
+                            <div class="toc-item toc-level-2"><a href="#basic-programming-concepts">Basic Programming Concepts</a></div>
+                            <div class="toc-item toc-level-2"><a href="#practice-exercises">Practice Exercises</a></div>
+                        </nav>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h3 class="text-lg font-semibold text-indigo-600 mb-4">Learning Progress</h3>
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                                    <span>R Basics</span>
+                                    <span>2/6</span>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: 33.33%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col space-y-2">
+                                <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition w-full" data-navigate="data-types">Next: Data Types</button>
+                                <button class="px-4 py-2 bg-white border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50 transition w-full" data-navigate="r-installation">Previous: Installation</button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <h3 class="text-lg font-semibold text-indigo-600 mb-4">Additional Resources</h3>
+                            <ul class="space-y-2">
+                                <li>
+                                    <a href="https://cran.r-project.org/doc/manuals/r-release/R-intro.html" target="_blank" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                                        <i class="fas fa-external-link-alt mr-2 text-xs"></i>
+                                        An Introduction to R (Official)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/watch?v=SWxoJqTqo08" target="_blank" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                                        <i class="fas fa-video mr-2 text-xs"></i>
+                                        R Programming Basics Video
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://posit.co/wp-content/uploads/2022/10/base-r.pdf" target="_blank" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                                        <i class="fas fa-file-alt mr-2 text-xs"></i>
+                                        Base R Cheatsheet
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- DATA TYPES -->
+        <section id="data-types" class="page-section fade-in">
+            <div class="breadcrumb text-sm text-gray-500 mb-4">
+                <div class="breadcrumb-item"><a href="#" data-navigate="home">Home</a></div>
+                <div class="breadcrumb-item"><a href="#" data-navigate="beginner-overview">Beginner Track</a></div>
+                <div class="breadcrumb-item">Data Types</div>
+            </div>
+            
+            <header class="mb-8">
+                <h1 class="text-3xl font-bold text-indigo-700 mb-3">Data Types and Structures in R</h1>
+                <p class="text-gray-600">Understanding how R organizes and manipulates data</p>
+            </header>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Overview of R Data Structures</h2>
+                        
+                        <p class="mb-4">R has several key data structures that you'll use regularly. These structures can be classified by their dimensionality (1D, 2D, or nD) and whether they're homogeneous (all elements of the same type) or heterogeneous (elements of different types).</p>
+                        
+                        <div class="overflow-x-auto mb-6">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Homogeneous</th>
+                                        <th>Heterogeneous</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>1-Dimensional</strong></td>
+                                        <td>Vector</td>
+                                        <td>List</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>2-Dimensional</strong></td>
+                                        <td>Matrix</td>
+                                        <td>Data Frame</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>n-Dimensional</strong></td>
+                                        <td>Array</td>
+                                        <td>-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <p>We'll explore each of these data structures in detail, starting with the most fundamental: vectors.</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Vectors (1D, Homogeneous)</h2>
+                        
+                        <p class="mb-4">We introduced vectors briefly in the R Basics section. Let's explore them in more detail.</p>
+                        
+                        <p class="mb-4">A vector is a one-dimensional collection of elements of the same type. The main vector types in R correspond to the basic data types:</p>
+                        
+                        <ul class="list-disc pl-6 mb-6 space-y-1">
+                            <li>Numeric vectors</li>
+                            <li>Integer vectors</li>
+                            <li>Character vectors</li>
+                            <li>Logical vectors</li>
+                            <li>Complex vectors</li>
+                        </ul>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Creating Vectors</h3>
+                        
+                        <div class="code-block mb-6">
+# Using c() to combine values
+numeric_vec <- c(10.5, 20.3, 30.7)
+integer_vec <- c(1L, 2L, 3L)  # 'L' suffix creates integers
+character_vec <- c("red", "green", "blue")
+logical_vec <- c(TRUE, FALSE, TRUE)
+
+# Creating vectors with functions
+seq_vec <- seq(from = 1, to = 10, by = 2)  # 1 3 5 7 9
+rep_vec <- rep(1:3, times = 2)  # 1 2 3 1 2 3
+rep_each_vec <- rep(1:3, each = 2)  # 1 1 2 2 3 3</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Vector Coercion</h3>
+                        
+                        <p class="mb-4">When you try to combine elements of different types in a vector, R will coerce them to a common type according to this hierarchy: logical → integer → numeric → character</p>
+                        
+                        <div class="code-block mb-6">
+# Examples of coercion
+mixed_vec1 <- c(TRUE, 1, 2)  # All become numeric: 1 1 2
+mixed_vec2 <- c(1, "hello")  # All become character: "1" "hello"
+mixed_vec3 <- c(TRUE, "hello")  # All become character: "TRUE" "hello"
+
+# Explicit coercion
+num_to_char <- as.character(1:5)  # "1" "2" "3" "4" "5"
+char_to_num <- as.numeric(c("10", "20", "30"))  # 10 20 30
+log_to_int <- as.integer(c(TRUE, FALSE, TRUE))  # 1 0 1</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Named Vectors</h3>
+                        
+                        <p class="mb-4">You can assign names to vector elements:</p>
+                        
+                        <div class="code-block mb-6">
+# Create a named vector
+scores <- c(math = 95, english = 87, science = 92)
+scores  # math english science 
+       #   95      87      92
+
+# Access by name
+scores["math"]  # 95
+
+# Add names after creation
+ages <- c(35, 42, 29)
+names(ages) <- c("John", "Mary", "David")
+ages  # John Mary David 
+     #   35   42    29</div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Matrices (2D, Homogeneous)</h2>
+                        
+                        <p class="mb-4">A matrix is a two-dimensional collection of elements of the same type, organized in rows and columns.</p>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Creating Matrices</h3>
+                        
+                        <div class="code-block mb-6">
+# Create a matrix from a vector by specifying the dimensions
+m1 <- matrix(1:6, nrow = 2, ncol = 3)
+m1
+#      [,1] [,2] [,3]
+# [1,]    1    3    5
+# [2,]    2    4    6
+
+# By default, matrices are filled by column
+# Use byrow = TRUE to fill by row instead
+m2 <- matrix(1:6, nrow = 2, ncol = 3, byrow = TRUE)
+m2
+#      [,1] [,2] [,3]
+# [1,]    1    2    3
+# [2,]    4    5    6
+
+# Create a matrix by binding vectors
+x <- 1:3
+y <- 4:6
+cbind(x, y)  # column binding
+#      x y
+# [1,] 1 4
+# [2,] 2 5
+# [3,] 3 6
+
+rbind(x, y)  # row binding
+#   [,1] [,2] [,3]
+# x    1    2    3
+# y    4    5    6</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Matrix Operations</h3>
+                        
+                        <div class="code-block mb-6">
+# Dimensions
+dim(m1)  # 2 3 (rows, columns)
+nrow(m1)  # 2 (number of rows)
+ncol(m1)  # 3 (number of columns)
+
+# Element-wise operations
+m1 + 10  # adds 10 to each element
+m1 * 2   # multiplies each element by 2
+
+# Matrix multiplication (using %*% for actual matrix multiplication)
+a <- matrix(1:4, nrow = 2)
+b <- matrix(5:8, nrow = 2)
+a * b    # element-wise multiplication
+#      [,1] [,2]
+# [1,]    5   14
+# [2,]   10   24
+
+a %*% b  # matrix multiplication
+#      [,1] [,2]
+# [1,]   19   22
+# [2,]   43   50
+
+# Transpose a matrix
+t(m1)
+#      [,1] [,2]
+# [1,]    1    2
+# [2,]    3    4
+# [3,]    5    6</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Matrix Indexing</h3>
+                        
+                        <div class="code-block mb-6">
+# Create a matrix
+mat <- matrix(1:9, nrow = 3, ncol = 3)
+mat
+#      [,1] [,2] [,3]
+# [1,]    1    4    7
+# [2,]    2    5    8
+# [3,]    3    6    9
+
+# Access a single element - mat[row, column]
+mat[1, 2]  # 4 (row 1, column 2)
+
+# Access an entire row
+mat[2, ]  # 2 5 8 (row 2, all columns)
+
+# Access an entire column
+mat[, 3]  # 7 8 9 (all rows, column 3)
+
+# Access multiple elements
+mat[c(1, 3), c(1, 3)]  # a submatrix
+#      [,1] [,2]
+# [1,]    1    7
+# [2,]    3    9</div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Arrays (nD, Homogeneous)</h2>
+                        
+                        <p class="mb-4">Arrays are n-dimensional generalizations of vectors and matrices. They can have any number of dimensions, though 3D arrays are most common.</p>
+                        
+                        <div class="code-block mb-6">
+# Create a 3D array (2x3x2)
+arr <- array(1:12, dim = c(2, 3, 2))
+arr
+# , , 1
+#      [,1] [,2] [,3]
+# [1,]    1    3    5
+# [2,]    2    4    6
+#
+# , , 2
+#      [,1] [,2] [,3]
+# [1,]    7    9   11
+# [2,]    8   10   12
+
+# Access elements: arr[row, column, layer]
+arr[1, 2, 2]  # 9 (row 1, column 2, layer 2)
+
+# Access a slice
+arr[, , 1]  # first layer (2x3 matrix)
+#      [,1] [,2] [,3]
+# [1,]    1    3    5
+# [2,]    2    4    6</div>
+                        
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-yellow-800">Note</h3>
+                                    <div class="text-sm text-yellow-700">
+                                        <p>While arrays are useful for certain applications (especially scientific computing), they are less commonly used in everyday data analysis than the other data structures we're discussing.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Lists (1D, Heterogeneous)</h2>
+                        
+                        <p class="mb-4">Lists are versatile data structures that can contain elements of different types, including other lists. They're like flexible containers that can hold anything.</p>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Creating Lists</h3>
+                        
+                        <div class="code-block mb-6">
+# Create a list with different types of elements
+my_list <- list(
+  name = "John",
+  age = 30,
+  scores = c(85, 90, 78),
+  passed = TRUE,
+  address = list(
+    street = "123 Main St",
+    city = "Springfield",
+    zip = 12345
+  )
+)
+
+my_list
+# $name
+# [1] "John"
+#
+# $age
+# [1] 30
+#
+# $scores
+# [1] 85 90 78
+#
+# $passed
+# [1] TRUE
+#
+# $address
+# $address$street
+# [1] "123 Main St"
+#
+# $address$city
+# [1] "Springfield"
+#
+# $address$zip
+# [1] 12345</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Accessing List Elements</h3>
+                        
+                        <p class="mb-4">There are several ways to access elements in a list:</p>
+                        
+                        <div class="code-block mb-6">
+# Using square brackets - returns a sublist
+my_list["name"]  # list with one element named "name"
+# $name
+# [1] "John"
+
+# Using double square brackets - returns the actual element
+my_list[["name"]]  # "John"
+
+# Using $ notation for named elements
+my_list$name  # "John"
+my_list$scores[2]  # 90 (second element of scores vector)
+my_list$address$city  # "Springfield"
+
+# Accessing by position
+my_list[[1]]  # "John" (first element)
+my_list[[5]][[2]]  # "Springfield" (second element of fifth element)</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Modifying Lists</h3>
+                        
+                        <div class="code-block mb-6">
+# Add new elements
+my_list$email <- "john@example.com"
+
+# Update existing elements
+my_list$age <- 31
+
+# Remove elements
+my_list$passed <- NULL</div>
+                        
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800">Key Point</h3>
+                                    <div class="text-sm text-blue-700">
+                                        <p>The difference between <code>my_list["name"]</code> and <code>my_list[["name"]]</code> is important. The single bracket returns a sublist, while the double bracket returns the actual element.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Data Frames (2D, Heterogeneous)</h2>
+                        
+                        <p class="mb-4">Data frames are the most important data structure for data analysis in R. They are similar to tables in a database or Excel spreadsheets, with rows representing observations and columns representing variables.</p>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Creating Data Frames</h3>
+                        
+                        <div class="code-block mb-6">
+# Create a data frame from vectors
+name <- c("Alice", "Bob", "Charlie", "David")
+age <- c(25, 30, 35, 28)
+department <- c("HR", "IT", "Finance", "Marketing")
+salary <- c(55000, 65000, 70000, 60000)
+
+employees <- data.frame(name, age, department, salary)
+employees
+#      name age department salary
+# 1   Alice  25         HR  55000
+# 2     Bob  30         IT  65000
+# 3 Charlie  35    Finance  70000
+# 4   David  28  Marketing  60000
+
+# Directly create a data frame
+students <- data.frame(
+  id = 1:3,
+  name = c("Emma", "Frank", "Grace"),
+  gpa = c(3.8, 3.5, 4.0),
+  stringsAsFactors = FALSE  # Prevents character vectors from being converted to factors
+)</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Exploring Data Frames</h3>
+                        
+                        <div class="code-block mb-6">
+# Basic information
+dim(employees)  # 4 4 (rows, columns)
+nrow(employees)  # 4
+ncol(employees)  # 4
+names(employees)  # "name" "age" "department" "salary"
+str(employees)  # Structure of the data frame
+head(employees, 2)  # First 2 rows
+tail(employees, 2)  # Last 2 rows
+summary(employees)  # Summary statistics</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Accessing Data Frame Elements</h3>
+                        
+                        <div class="code-block mb-6">
+# Access a column by name
+employees$name  # "Alice" "Bob" "Charlie" "David"
+employees[["name"]]  # Same as above
+employees[ ,"name"]  # Same as above
+
+# Access a row by position
+employees[1, ]  # First row
+
+# Access a specific cell
+employees[2, 3]  # "IT" (row 2, column 3)
+employees[2, "department"]  # "IT"
+
+# Access multiple columns
+employees[, c("name", "salary")]
+#      name salary
+# 1   Alice  55000
+# 2     Bob  65000
+# 3 Charlie  70000
+# 4   David  60000
+
+# Access based on conditions
+employees[employees$age > 30, ]
+#      name age department salary
+# 3 Charlie  35    Finance  70000</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Modifying Data Frames</h3>
+                        
+                        <div class="code-block mb-6">
+# Add a new column
+employees$years_employed <- c(2, 5, 8, 3)
+
+# Update values
+employees$salary[employees$name == "Alice"] <- 57000
+
+# Add a new row
+new_employee <- data.frame(
+  name = "Eve",
+  age = 32,
+  department = "IT",
+  salary = 68000,
+  years_employed = 4
+)
+employees <- rbind(employees, new_employee)
+
+# Remove a column
+employees$years_employed <- NULL  # Remove the years_employed column
+
+# Remove rows
+employees <- employees[employees$department != "HR", ]  # Remove HR employees</div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Factors</h2>
+                        
+                        <p class="mb-4">Factors are special data types used to represent categorical variables. They are especially important for statistical modeling and data visualization.</p>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Creating Factors</h3>
+                        
+                        <div class="code-block mb-6">
+# Create a factor
+gender <- factor(c("male", "female", "male", "male", "female"))
+gender
+# [1] male   female male   male   female
+# Levels: female male
+
+# Create a factor with specified levels and order
+education <- factor(
+  c("high school", "college", "graduate", "high school", "graduate"),
+  levels = c("high school", "college", "graduate"),
+  ordered = TRUE
+)
+education
+# [1] high school college     graduate    high school graduate   
+# Levels: high school < college < graduate</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Working with Factors</h3>
+                        
+                        <div class="code-block mb-6">
+# Get the levels
+levels(gender)  # "female" "male"
+
+# Count occurrences
+table(gender)
+# gender
+# female   male 
+#      2      3
+
+# Change levels
+levels(gender) <- c("F", "M")
+gender
+# [1] M F M M F
+# Levels: F M
+
+# Add a new level
+levels(gender) <- c(levels(gender), "O")  # Add "Other" level
+gender
+# [1] M F M M F
+# Levels: F M O</div>
+                        
+                        <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-blue-800">Important Note</h3>
+                                    <div class="text-sm text-blue-700">
+                                        <p>In older versions of R, <code>data.frame()</code> would automatically convert character columns to factors by default. This behavior can be controlled with the <code>stringsAsFactors</code> parameter. In R 4.0.0 and later, this default has changed, and character columns remain as character columns.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Date and Time Objects</h2>
+                        
+                        <p class="mb-4">R has several classes for working with dates and times:</p>
+                        
+                        <div class="code-block mb-6">
+# Date objects (class "Date")
+today <- Sys.Date()
+today  # current date, e.g., "2023-07-15"
+class(today)  # "Date"
+
+# Create dates from strings
+dates <- as.Date(c("2023-01-15", "2023-02-20", "2023-03-25"))
+dates
+# [1] "2023-01-15" "2023-02-20" "2023-03-25"
+
+# Different format
+custom_date <- as.Date("15/Mar/2023", format = "%d/%b/%Y")
+custom_date
+# [1] "2023-03-15"
+
+# POSIX date-time objects
+now <- Sys.time()
+now  # current date and time, e.g., "2023-07-15 14:30:45 EDT"
+class(now)  # "POSIXct" "POSIXt"
+
+# Create date-time objects
+datetime <- as.POSIXct("2023-07-15 14:30:45", tz = "UTC")
+datetime
+# [1] "2023-07-15 14:30:45 UTC"</div>
+                        
+                        <h3 class="text-lg font-semibold mb-3">Calculations with Dates</h3>
+                        
+                        <div class="code-block mb-6">
+# Difference between dates
+end_date <- as.Date("2023-12-31")
+start_date <- as.Date("2023-01-01")
+end_date - start_date
+# Time difference of 364 days
+
+# Add/subtract days
+today + 30  # 30 days from today
+today - 7   # 7 days ago
+
+# Extract components
+format(today, "%Y")  # year
+format(today, "%m")  # month
+format(today, "%d")  # day
+format(today, "%A")  # day of the week
+format(now, "%H:%M:%S")  # time</div>
+                        
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-yellow-800">Note</h3>
+                                    <div class="text-sm text-yellow-700">
+                                        <p>For more advanced date/time manipulation, consider using the <code>lubridate</code> package from the tidyverse, which simplifies many common date/time operations.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                        <h2 class="text-2xl font-semibold text-indigo-600 mb-4">Practice Exercises</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Exercise 1: Working with Vectors</h3>
+                                <p class="text-gray-600 mb-3">Create a numeric vector of temperatures in Celsius for a week. Convert these temperatures to Fahrenheit (F = C * 9/5 + 32).</p>
+                                <button class="text-sm text-indigo-600 hover:text-indigo-800" onclick="toggleSolution('solution_dt1')">Show/Hide Solution</button>
+                                <div id="solution_dt1" class="mt-3 hidden">
+                                    <div class="code-block">
+# Create a vector of temperatures in Celsius
+celsius <- c(22, 24, 19, 18, 25, 26, 23)
+
+# Convert to Fahrenheit
+fahrenheit <- celsius * 9/5 + 32
+
+# Create a named vector
+day_names <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+names(celsius) <- day_names
+names(fahrenheit) <- day_names
+
+# Display both
+celsius
+fahrenheit
+
+# Create a data frame for better visualization
+temp_df <- data.frame(
+  Day = day_names,
+  Celsius = celsius,
+  Fahrenheit = fahrenheit
+)
+temp_df</div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Exercise 2: Creating and Manipulating a Matrix</h3>
+                                <p class="text-gray-600 mb-3">Create a 3x3 matrix of numbers 1 to 9. Calculate the sum of each row and each column.</p>
+                                <button class="text-sm text-indigo-600 hover:text-indigo-800" onclick="toggleSolution('solution_dt2')">Show/Hide Solution</button>
+                                <div id="solution_dt2" class="mt-3 hidden">
+                                    <div class="code-block">
+# Create a 3x3 matrix
+m <- matrix(1:9, nrow = 3, ncol = 3)
+print(m)
+
+# Calculate row sums
+row_sums <- rowSums(m)
+print(paste("Row sums:", paste(row_sums, collapse = ", ")))
+
+# Calculate column sums
+col_sums <- colSums(m)
+print(paste("Column sums:", paste(col_sums, collapse = ", ")))
+
+# Add row and column sums to the matrix
+m_with_sums <- cbind(m, RowSum = row_sums)
+m_with_sums <- rbind(m_with_sums, ColSum = c(col_sums, sum(m)))
+print(m_with_sums)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Exercise 3: Working with Lists</h3>
+                                <p class="text-gray-600 mb-3">Create a list representing a person with name, age, hobbies (as a vector), and address (as a nested list with street, city, and postal code).</p>
+                                <button class="text-sm text-indigo-600 hover:text-indigo-800" onclick="toggleSolution('solution_dt3')">Show/Hide Solution</button>
+                                <div id="solution_dt3" class="mt-3 hidden">
+                                    <div class="code-block">
+# Create a list representing a person
+person <- list(
+  name = "Sarah Johnson",
+  age = 35,
+  hobbies = c("reading", "hiking", "photography", "cooking"),
+  address = list(
+    street = "456 Oak Avenue",
+    city = "Portland",
+    state = "Oregon",
+    postal_code = "97201"
+  ),
+  is_employed = TRUE
+)
+
+# Print the full list
+print(person)
+
+# Access specific elements
+print(paste("Name:", person$name))
+print(paste("Age:", person$age))
+print(paste("Hobbies:", paste(person$hobbies, collapse = ", ")))
+print(paste("City:", person$address$city))
+
+# Add a new element
+person$email <- "sarah.j@example.com"
+
+# Update a nested element
+person$address$postal_code <- "97202"
+
+# Print the updated list
+print(person)</div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <h3 class="font-semibold mb-2">Exercise 4: Creating and Manipulating a Data Frame</h3>
+                                <p class="text-gray-600 mb-3">Create a data frame of student records with columns for ID, name, major, and GPA. Calculate the average GPA, and add a new column indicating whether each student is above or below average.</p>
+                                <button class="text-sm text-indigo-600 hover:text-indigo-800" onclick="toggleSolution('solution_dt4')">Show/Hide Solution</button>
+                                <div id="solution_dt4" class="mt-3 hidden">
+                                    <div class="code-block">
+# Create a data frame of student records
+students <- data.frame(
+  id = 1001:1005,
+  name = c("Alex", "Beth", "Carlos", "Diana", "Ethan"),
+  major = c("Computer Science", "Psychology", "Engineering", "Biology", "English"),
+  gpa = c(3.7, 3.9, 3.2, 3.8, 3.5)
+)
+
+# Display the data frame
+print(students)
+
+# Calculate average GPA
+avg_gpa <- mean(students$gpa)
+print(paste("Average GPA:", round(avg_gpa, 2)))
+
+# Add a new column indicating if student is above or below average
+students$above_avg <- students$gpa > avg_gpa
+
+# Another approach using ifelse
+students$performance <- ifelse(students$gpa >= 3.7, "Excellent", 
+                              ifelse(students$gpa >= 3.5, "Good", "Average"))
+
+# Display the updated data frame
+print(students)
+
+# Filter students with above-average GPA
+above_avg_students <- students[students$above_avg, ]
+print("Students with above-average GPA:")
+print(above_avg_students)</div>
+                                </div>
+                            </div>
+                        </div>
